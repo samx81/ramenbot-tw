@@ -15,11 +15,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="645">
-              <caret line="632" column="18" lean-forward="true" selection-start-line="632" selection-start-column="18" selection-end-line="632" selection-end-column="18" />
+            <state relative-caret-position="355">
+              <caret line="21" column="71" lean-forward="true" selection-start-line="21" selection-start-column="71" selection-end-line="21" selection-end-column="71" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
-                <element signature="e#398#711#0" />
                 <element signature="e#2426#2578#0" />
                 <element signature="e#3939#4232#0" />
                 <element signature="e#4255#4317#0" />
@@ -370,11 +369,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="632" column="18" lean-forward="true" selection-start-line="632" selection-start-column="18" selection-end-line="632" selection-end-column="18" />
+        <state relative-caret-position="355">
+          <caret line="21" column="71" lean-forward="true" selection-start-line="21" selection-start-column="71" selection-end-line="21" selection-end-column="71" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
-            <element signature="e#398#711#0" />
             <element signature="e#2426#2578#0" />
             <element signature="e#3939#4232#0" />
             <element signature="e#4255#4317#0" />

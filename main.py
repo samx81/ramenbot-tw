@@ -11,7 +11,7 @@ from functools import wraps
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ConversationHandler
 
-LIST_OF_ADMINS = [135035100]
+LIST_OF_ADMINS = [135035100,237466855]
 
 
 def restricted(func):
