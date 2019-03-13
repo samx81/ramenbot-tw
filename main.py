@@ -338,7 +338,8 @@ add_str_dict: Dict[int, str] = {
 def add_new(update, context):
     if len(newshop) == 0:
         update.message.reply_markdown("請按照提示輸入對應的資料\n"
-                                      "未知可填無")
+                                      "未知可填無\n"
+                                      "若要取消請輸入 /cancel")
         update.message.reply_text(add_str_dict[-1])
         return "gathering"
     else:
