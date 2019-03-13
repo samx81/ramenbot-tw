@@ -593,24 +593,16 @@ def main():
     """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
 
-
     if mode == "dev":
-        def run():
             updater = Updater((config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
             updater.start_polling()
-            updater.idle()
     elif mode == "prod":
-        def run():
             TOKEN = os.environ.get('ACCESS_TOKEN')
             PORT = int(os.environ.get('PORT', '8443'))
 
             updater = Updater(TOKEN, use_context=True)
             # add handlers
-            updater.start_webhook(listen="0.0.0.0",
-                                  port=PORT,
-                                  url_path=TOKEN)
-            updater.bot.set_webhook("https://ramenbot-tw.herokuapp.com/" + TOKEN)
-            updater.idle()
+
     else:
         logger.error("No MODE specified!")
         sys.exit(1)
@@ -631,8 +623,14 @@ def main():
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
 
-    run(updater)
-
+    if mode == "dev":
+        updater.start_polling()
+    elif mode == "prod":
+        updater.start_webhook(listen="0.0.0.0",
+                              port=PORT,
+                              url_path=TOKEN)
+        updater.bot.set_webhook("https://ramenbot-tw.herokuapp.com/" + TOKEN)
+    updater.idle()
 
 def getTime():
 
