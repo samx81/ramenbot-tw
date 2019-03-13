@@ -33,7 +33,7 @@ config.read('config.ini')
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
-gmaps = googlemaps.Client(key=config['GOOGLE']['API_KEY'])
+#gmaps = googlemaps.Client(key=config['GOOGLE']['API_KEY'])
 mode = os.getenv("env")
 
 
@@ -255,9 +255,9 @@ def found(update, context):
     query = update.callback_query
 
 # TODO: push location
-def getlocation(update, context):
-    geocode_result = gmaps.reverse_geocode((update.message.location.latitude, update.message.location.longitude))
-    print(geocode_result)
+# def getlocation(update, context):
+#     geocode_result = gmaps.reverse_geocode((update.message.location.latitude, update.message.location.longitude))
+#     print(geocode_result)
 
 
 def by_soup(update, context):
