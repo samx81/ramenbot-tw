@@ -44,7 +44,7 @@ if mode == "dev":
         updater.idle()
 elif mode == "prod":
     def run(updater):
-        TOKEN = (config['TELEGRAM']['ACCESS_TOKEN'])
+        TOKEN = os.environ.get('ACCESS_TOKEN')
         PORT = int(os.environ.get('PORT', '8443'))
 
         updater = Updater(TOKEN)
@@ -53,6 +53,7 @@ elif mode == "prod":
                               port=PORT,
                               url_path=TOKEN)
         updater.bot.set_webhook("https://ramenbot-tw.herokuapp.com/" + TOKEN)
+        updater.idle()
 else:
     logger.error("No MODE specified!")
     sys.exit(1)
