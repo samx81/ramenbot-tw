@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="462ce89b-39a4-4ada-bbda-5cf108c5bb78" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,13 +15,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="531">
-              <caret line="44" column="20" lean-forward="true" selection-start-line="44" selection-start-column="20" selection-end-line="44" selection-end-column="20" />
+            <state relative-caret-position="368">
+              <caret line="605" column="54" lean-forward="true" selection-start-line="605" selection-start-column="54" selection-end-line="605" selection-end-column="54" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
                 <element signature="e#398#711#0" />
-                <element signature="e#1226#1299#0" />
-                <element signature="e#1727#1777#0" />
                 <element signature="e#2426#2578#0" />
                 <element signature="e#3939#4232#0" />
                 <element signature="e#4255#4317#0" />
@@ -111,7 +107,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="933" />
@@ -374,13 +370,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="531">
-          <caret line="44" column="20" lean-forward="true" selection-start-line="44" selection-start-column="20" selection-end-line="44" selection-end-column="20" />
+        <state relative-caret-position="368">
+          <caret line="605" column="54" lean-forward="true" selection-start-line="605" selection-start-column="54" selection-end-line="605" selection-end-column="54" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
             <element signature="e#398#711#0" />
-            <element signature="e#1226#1299#0" />
-            <element signature="e#1727#1777#0" />
             <element signature="e#2426#2578#0" />
             <element signature="e#3939#4232#0" />
             <element signature="e#4255#4317#0" />

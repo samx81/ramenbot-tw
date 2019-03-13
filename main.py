@@ -37,26 +37,7 @@ logger = logging.getLogger(__name__)
 gmaps = googlemaps.Client(key=config['GOOGLE']['API_KEY'])
 mode = os.getenv("env")
 
-if mode == "dev":
-    def run(updater):
 
-        updater.start_polling()
-        updater.idle()
-elif mode == "prod":
-    def run(updater):
-        TOKEN = os.environ.get('ACCESS_TOKEN')
-        PORT = int(os.environ.get('PORT', '8443'))
-
-        updater = Updater(TOKEN)
-        # add handlers
-        updater.start_webhook(listen="0.0.0.0",
-                              port=PORT,
-                              url_path=TOKEN)
-        updater.bot.set_webhook("https://ramenbot-tw.herokuapp.com/" + TOKEN)
-        updater.idle()
-else:
-    logger.error("No MODE specified!")
-    sys.exit(1)
 
 jb = jieba_hant
 
@@ -612,8 +593,28 @@ addHandler = ConversationHandler(
 def main():
     """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater((config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
 
+
+    if mode == "dev":
+        def run():
+            updater = Updater((config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
+            updater.start_polling()
+            updater.idle()
+    elif mode == "prod":
+        def run():
+            TOKEN = os.environ.get('ACCESS_TOKEN')
+            PORT = int(os.environ.get('PORT', '8443'))
+
+            updater = Updater(TOKEN, use_context=True)
+            # add handlers
+            updater.start_webhook(listen="0.0.0.0",
+                                  port=PORT,
+                                  url_path=TOKEN)
+            updater.bot.set_webhook("https://ramenbot-tw.herokuapp.com/" + TOKEN)
+            updater.idle()
+    else:
+        logger.error("No MODE specified!")
+        sys.exit(1)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
