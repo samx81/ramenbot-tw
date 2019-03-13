@@ -1,1 +1,1 @@
-web: python herokubot.py
+web: python main.py

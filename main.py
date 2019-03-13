@@ -6,7 +6,6 @@ import time,random
 from typing import Dict
 
 import dbHelper
-import googlemaps
 import jieba_hant
 from functools import wraps
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ParseMode
