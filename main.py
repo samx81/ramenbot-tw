@@ -632,7 +632,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("random", random_ramen))
     dp.add_handler(CommandHandler("event", by_event))
-    dp.add_handler(CommandHandler("rare", rare))
+    dp.add_handler(CommandHandler("rare", rare_condition))
     dp.add_handler(CommandHandler("help", tg_help))
     dp.add_handler(CallbackQueryHandler(random_ramen, pattern="random"))
     dp.add_handler(CallbackQueryHandler(search, pattern="find"))
