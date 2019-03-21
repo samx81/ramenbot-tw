@@ -353,93 +353,97 @@ def getinfo(update, context):
     else:
         logger.info(update.callback_query.data)
     logger.info(",".join(map(str, newshop)))
-    if len(newshop) == 0:
-        st = dbHelper.query_like('name',update.message.text)
-        if st:
-            update.message.reply_text('資料庫條目可能有重複，若為不同店家請繼續輸入')
-            db_str = "重複列表：\n"
-            for i in st:
-                db_str += i['name']+"\n"
-            update.message.reply_markdown(db_str)
+    try:
+        if len(newshop) == 0:
+            st = dbHelper.query_like('name',update.message.text)
+            if st:
+                update.message.reply_text('資料庫條目可能有重複，若為不同店家請繼續輸入')
+                db_str = "重複列表：\n"
+                for i in st:
+                    db_str += i['name']+"\n"
+                update.message.reply_markdown(db_str)
 
-        newshop.append(update.message.text)
-        update.message.reply_text(add_str_dict[0]+
-                                  "\n長的像這樣 goo.gl/maps/[key]\n"
-                                  "請輸入 [key] 部分或是整個網址")
-        return "gathering"
-    if len(newshop) == 1:
-        # if find a '/' do
-        gid = ""
-        if update.message.text.find('/') == -1:
-            gid = update.message.text
-        # else if find googl do
-        elif update.message.text.find('goo.gl/maps/') != -1:
-            gid = update.message.text[
-                  (update.message.text.find('goo.gl/maps/')+len('goo.gl/maps/'))
-                  :]
-        else:
-            update.message.reply_text('請檢查你輸入的是否有誤\n'
-                                      '格式為https://goo.gl/maps/________')
+            newshop.append(update.message.text)
+            update.message.reply_text(add_str_dict[0]+
+                                      "\n長的像這樣 goo.gl/maps/[key]\n"
+                                      "請輸入 [key] 部分或是整個網址")
             return "gathering"
-        newshop.append(gid)
-        update.message.reply_text(add_str_dict[1])
-
-        return "gathering"
-    if len(newshop) == 2:
-        valid_loc = check_valid_location(update.message.text)
-        if valid_loc is not None:
-            newshop.append(valid_loc)
-            update.message.reply_text(add_str_dict[2])
-        else:
-            update.message.reply_text("請檢查你輸入的位置，捷運站請加\"站\""
-                                      "，城市請加縣市區")
-        return "gathering"
-    if len(newshop) == 3:
-        input = update.message.text
-        wd = ""
-        try:
-            # number
-            if is_int(input) and int(input) != -1:
-                wd = int(input)-1
-            # only one char
-            elif len(update.message.text) == 1:
-                if update.message.text == "無":
-                    wd = -1
-                else:
-                    wd = "星期"+input if input != "天" else "星期日"
-                    wd = (list(week_day_dict.keys())[list(week_day_dict.values()).index(wd)])
+        if len(newshop) == 1:
+            # if find a '/' do
+            gid = ""
+            if update.message.text.find('/') == -1:
+                gid = update.message.text
+            # else if find googl do
+            elif update.message.text.find('goo.gl/maps/') != -1:
+                gid = update.message.text[
+                      (update.message.text.find('goo.gl/maps/')+len('goo.gl/maps/'))
+                      :]
             else:
-                wd = (list(week_day_dict.keys())[list(week_day_dict.values()).index(input)])
-            if wd != "":
-                newshop.append(wd)
-                print(wd)
-                update.message.reply_text(add_str_dict[3])
+                update.message.reply_text('請檢查你輸入的是否有誤\n'
+                                          '格式為https://goo.gl/maps/________')
                 return "gathering"
-        except ValueError:
-            update.message.reply_text("check input")
-    if len(newshop) == 4:
-        # deal with time
-        tmp = str(update.message.text)
-        timelist = list()
-        if tmp.find(","):
-            tmp = tmp.split(",")
-            timelist= tmp[0].split('-')+tmp[1].split('-')
-        newshop.append(",".join(timelist))
-        update.message.reply_text(add_str_dict[4])
-        return "gathering"
+            newshop.append(gid)
+            update.message.reply_text(add_str_dict[1])
 
-    if len(newshop) == 5:
-        newshop.append(update.message.text)
-        update.message.reply_text(add_str_dict[5])
-        return "gathering"
-    if len(newshop) == 6:
-        newshop.append(update.message.text)
-        update.message.reply_text(add_str_dict[6])
-        return "gathering"
-    if len(newshop) == 7:
-        newshop.append(update.message.text)
-        update.message.reply_text(add_str_dict[7])
-        return "preview"
+            return "gathering"
+        if len(newshop) == 2:
+            valid_loc = check_valid_location(update.message.text)
+            if valid_loc is not None:
+                newshop.append(valid_loc)
+                update.message.reply_text(add_str_dict[2])
+            else:
+                update.message.reply_text("請檢查你輸入的位置，捷運站請加\"站\""
+                                          "，城市請加縣市區")
+            return "gathering"
+        if len(newshop) == 3:
+            input = update.message.text
+            wd = ""
+            try:
+                # number
+                if is_int(input) and int(input) != -1:
+                    wd = int(input)-1
+                # only one char
+                elif len(update.message.text) == 1:
+                    if update.message.text == "無":
+                        wd = -1
+                    else:
+                        wd = "星期"+input if input != "天" else "星期日"
+                        wd = (list(week_day_dict.keys())[list(week_day_dict.values()).index(wd)])
+                else:
+                    wd = (list(week_day_dict.keys())[list(week_day_dict.values()).index(input)])
+                if wd != "":
+                    newshop.append(wd)
+                    print(wd)
+                    update.message.reply_text(add_str_dict[3])
+                    return "gathering"
+            except ValueError:
+                update.message.reply_text("check input")
+        if len(newshop) == 4:
+            # deal with time
+            tmp = str(update.message.text)
+            timelist = list()
+            if tmp.find(","):
+                tmp = tmp.split(",")
+                timelist= tmp[0].split('-')+tmp[1].split('-')
+            newshop.append(",".join(timelist))
+            update.message.reply_text(add_str_dict[4])
+            return "gathering"
+
+        if len(newshop) == 5:
+            newshop.append(update.message.text)
+            update.message.reply_text(add_str_dict[5])
+            return "gathering"
+        if len(newshop) == 6:
+            newshop.append(update.message.text)
+            update.message.reply_text(add_str_dict[6])
+            return "gathering"
+        if len(newshop) == 7:
+            newshop.append(update.message.text)
+            update.message.reply_text(add_str_dict[7])
+            return "preview"
+    except AttributeError as e:
+        logger.info(e)
+        context.bot.send_message(chat_id=update.effective_chat.id, text="不正當的操作，請遵照對話互動或是輸入 /cancel 離開")
 
 
 def preview(update, context):
@@ -554,8 +558,21 @@ def by_event(update, context):
     pass
 
 
-def rare(update, context):
-    pass
+def rare_condition(update, context):
+    ask_str = "點擊按鈕選擇搜尋條件:"
+    keyboard = [[InlineKeyboardButton("星期一營業", callback_data="monday")],
+                [InlineKeyboardButton("宵夜", callback_data="midnight")],
+                # [InlineKeyboardButton("時間", callback_data="mealtime")],
+                [InlineKeyboardButton("被拉麵耽誤的飯店", callback_data="rice")]]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    if update.message:
+        update.message.reply_text(ask_str, reply_markup=reply_markup)
+    else:
+        query = update.callback_query
+        query.edit_message_text(ask_str,
+                                reply_markup=reply_markup)
+    return 'condition'
 
 
 # TODO: search by index
