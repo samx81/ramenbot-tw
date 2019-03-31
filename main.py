@@ -128,19 +128,28 @@ def is_int(value):
   except:
     return False
 
+
+class APM_dict(Enum):
+    m,af,n = "上午","下午","晚上"
 def getTime():
 
-    APM = {
-        "AM": "上午",
-        "PM": "下午"
-    }
+    def APM(hour):
+
+        if hour < 12:
+            return APM_dict.m
+        elif hour < 17:
+            return APM_dict.af
+        else:
+            return APM_dict.n
 
     queryTime = time.localtime()
     time_str = "查詢時間: %s %s %s \n" % (week_day_dict[queryTime.tm_wday],
-                                  APM[time.strftime("%p", queryTime)],
+                                  APM(queryTime.tm_hour).value,
                                   time.strftime("%I:%M", queryTime))
-    query = time.strftime("%H%M", queryTime)
-    return time_str, query
+    weekday = queryTime.tm_wday
+    hour_minute = time.strftime("%H%M", queryTime)
+    print(time_str)
+    return time_str, weekday,hour_minute
 
 # 簡易搜尋 #
 def search(update, context):
@@ -602,10 +611,10 @@ def rare_condition(update, context):
 # TODO: search by index
 
 def ramen_now(update, context):
-    message, query_time = getTime()
+    message,weekday, query_time = getTime()
 
     # Find in database
-    s = dbHelper.query_time(query_time)[0]
+    s = dbHelper.query_time(weekday,query_time)[0]
 
     # TODO: figure out where to put notes
     message += make_info_str(s, True)
@@ -620,7 +629,7 @@ def ramen_now(update, context):
 addHandler = ConversationHandler(
     entry_points=[CommandHandler("new", add_new)],
     states={
-        # TODO: catch error on two handler section
+        # TODO: catch error on two handler section?
        "gathering": [MessageHandler(Filters.text,getinfo),CallbackQueryHandler(getinfo)],
        "preview":[MessageHandler(Filters.text,preview),CallbackQueryHandler(preview_callback)],
        "edit":[CallbackQueryHandler(edit_notice),MessageHandler(Filters.text,edit_finish)],
@@ -662,7 +671,7 @@ def main():
     dp.add_handler(searchHandler)
     dp.add_handler(addHandler)
     # on noncommand i.e message - echo the message on Telegram
-    #dp.add_handler(MessageHandler(Filters.text, echo))
+    # dp.add_handler(MessageHandler(Filters.text, echo))
 
     if mode == "dev":
         pass

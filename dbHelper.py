@@ -60,12 +60,14 @@ def query_specify(col_list, key_list):
 
     # TODO: empty return handling
     return cur.fetchall()
-def query_time(time):
+def query_time(weekday,time):
     cur = checkenv()
     try:
-        print(time)
-        query_str = "SELECT * FROM ramenya where (opening[1]<'{time}' and opening[2] > '{time}') " \
-                    "or (opening[3]<'{time}' and opening[4] > '{time}') ORDER BY RANDOM();".format(time=time)
+        print(weekday,time)
+        query_str = "SELECT * FROM ramenya where (weekday = {weekday} or weekday = -1) and" \
+                    " ((opening[1]<'{time}' and opening[2] > '{time}') or" \
+                    " (opening[3]<'{time}' and opening[4] > '{time}')) ORDER BY RANDOM();"\
+                    .format(weekday = weekday,time=time)
         cur.execute(query_str)
     except sqlite3.OperationalError:
         print(query_str)
