@@ -88,7 +88,7 @@ format_template ="""
 
 
 class QUERY_METHOD(Enum):
-    LIKE, SPECIFY = range(2)
+    LIKE, SPECIFY,TIME = range(3)
 
 timeformattmp= "%H:%M"
 def make_info_str(s, sql):
@@ -134,7 +134,7 @@ def search(update, context):
     ask_str = "點擊按鈕選擇搜尋條件:"
     keyboard = [[InlineKeyboardButton("吃法", callback_data="type")],
                 [InlineKeyboardButton("湯頭", callback_data="soup")],
-               # [InlineKeyboardButton("時間", callback_data="mealtime")],
+                [InlineKeyboardButton("時間", callback_data="mealtime")],
                 [InlineKeyboardButton("地點", callback_data="location")]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -183,21 +183,21 @@ def condition(update, context):
 
 
 def mealtime(update, context):
-    cur_condition = "mealtime"
+    cur_condition = "opening"
     if update.callback_query is not None:
         query = update.callback_query.data
 
         def f(x):
             return {
                 'noon': 1200,
-                'afternoon': 1500,
+                'afternoon': 1530,
                 'night': 1800,
                 'midnight': 2130
             }.get(x, 1800)
         time_to_select = f(query)
-        s = dbHelper.query_like(cur_condition, time_to_select)
+        s = dbHelper.query_time(time_to_select)
         if s:
-            reply_markup = reply_markup = make_info_inline_kb(s[0]['gmapid'], cur_condition, query, QUERY_METHOD.LIKE)
+            reply_markup = reply_markup = make_info_inline_kb(s[0]['gmapid'], cur_condition, time_to_select, QUERY_METHOD.TIME)
             update.callback_query.message.reply_markdown(make_info_str(s[0], True), reply_markup=reply_markup,
                                                          parse_mode=ParseMode.MARKDOWN)
             return ConversationHandler.END
@@ -541,10 +541,13 @@ def find_another(update,context):
     # column, condition,gmapid, method
     repeat = True
     while repeat:
+        logger.info("looking for another")
         if querylist[2] == 'taipei':
             s = dbHelper.query_begin_with()[0]
         elif QUERY_METHOD(int(querylist[4])) == QUERY_METHOD.LIKE:
             s = dbHelper.query_like(querylist[1], querylist[2])[0]
+        elif QUERY_METHOD(int(querylist[4])) == QUERY_METHOD.TIME:
+            s = dbHelper.query_time(querylist[2])[0]
         else:
             s = dbHelper.query_specify([querylist[1]], [querylist[2]])[0]
         if len(s)==1 or s['gmapid'] != querylist[3]:
@@ -643,7 +646,8 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, echo))
 
     if mode == "dev":
-        updater.start_polling()
+        pass
+        #updater.start_polling()
     elif mode == "prod":
         updater.start_webhook(listen="0.0.0.0",
                               port=PORT,

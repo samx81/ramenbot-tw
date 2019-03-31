@@ -60,6 +60,16 @@ def query_specify(col_list, key_list):
 
     # TODO: empty return handling
     return cur.fetchall()
+def query_time(time):
+    cur = checkenv()
+    try:
+        print(time)
+        query_str = "SELECT * FROM ramenya where (opening[1]<'{time}' and opening[2] > '{time}') " \
+                    "or (opening[3]<'{time}' and opening[4] > '{time}') ORDER BY RANDOM();".format(time=time)
+        cur.execute(query_str)
+    except sqlite3.OperationalError:
+        print(query_str)
+    return cur.fetchall()
 
 def insert_new(list):
     s = "insert into ramenya (name, gmapid,loc,weekday,opening,soup,type,price,note) " \
