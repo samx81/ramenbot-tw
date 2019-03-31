@@ -11,13 +11,12 @@ from functools import wraps
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ConversationHandler
 
-LIST_OF_ADMINS = [135035100,237466855]
-
+LIST_OF_ADMINS = os.getenv("admins").split(',')
 
 def restricted(func):
     @wraps(func)
     def wrapped(update, context, *args, **kwargs):
-        user_id = update.effective_user.id
+        user_id = str(update.effective_user.id)
         if user_id not in LIST_OF_ADMINS:
             print("Unauthorized access denied for {}.".format(user_id))
             return
@@ -35,7 +34,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 #gmaps = googlemaps.Client(key=config['GOOGLE']['API_KEY'])
 mode = os.getenv("env")
-
 
 
 jb = jieba_hant
@@ -122,12 +120,27 @@ def make_info_inline_kb(gmapid,column,condition,method = QUERY_METHOD.SPECIFY):
                                       .format(column, condition, gmapid,method.value))]]
     return InlineKeyboardMarkup(keyboard)
 
+
 def is_int(value):
   try:
     int(value)
     return True
   except:
     return False
+
+def getTime():
+
+    APM = {
+        "AM": "上午",
+        "PM": "下午"
+    }
+
+    queryTime = time.localtime()
+    time_str = "查詢時間: %s %s %s \n" % (week_day_dict[queryTime.tm_wday],
+                                  APM[time.strftime("%p", queryTime)],
+                                  time.strftime("%I:%M", queryTime))
+    query = time.strftime("%H%M", queryTime)
+    return time_str, query
 
 # 簡易搜尋 #
 def search(update, context):
@@ -221,7 +234,7 @@ def by_location(update, context):
                 s = dbHelper.query_specify(['loc'], [valid_loc])
             print(s)
             if s :
-                reply_markup = reply_markup = make_info_inline_kb(s[0]['gmapid'], 'loc', valid_loc)
+                reply_markup = make_info_inline_kb(s[0]['gmapid'], 'loc', valid_loc)
                 update.message.reply_markdown(make_info_str(s[0], True), reply_markup=reply_markup,
                                               parse_mode=ParseMode.MARKDOWN)
                 return ConversationHandler.END
@@ -266,7 +279,8 @@ def by_soup(update, context):
         query = update.message.text
         s = dbHelper.query_like('soup', query)
         if s:
-            reply_markup = reply_markup = make_info_inline_kb(s[0]['gmapid'], cur_condition, query,QUERY_METHOD.LIKE)
+            reply_markup = make_info_inline_kb(s[0]['gmapid'], cur_condition, query,QUERY_METHOD.LIKE)
+            update.callback_query.edit_message_text(update.callback_query.message.text)
             update.message.reply_markdown(make_info_str(s[0], True), reply_markup=reply_markup,
                                           parse_mode=ParseMode.MARKDOWN)
             return ConversationHandler.END
@@ -284,9 +298,10 @@ def by_type(update, context):
         query = update.callback_query.data
         s = dbHelper.query_like(cur_condition, query)
         if s:
-            reply_markup = reply_markup = make_info_inline_kb(s[0]['gmapid'], cur_condition, query,QUERY_METHOD.LIKE)
+            reply_markup = make_info_inline_kb(s[0]['gmapid'], cur_condition, query,QUERY_METHOD.LIKE)
+            update.callback_query.edit_message_text(update.callback_query.message.text)
             update.callback_query.message.reply_markdown(make_info_str(s[0], True), reply_markup=reply_markup,
-                                          parse_mode=ParseMode.MARKDOWN)
+                                                         parse_mode=ParseMode.MARKDOWN)
             return ConversationHandler.END
         else:
             update.callback_query.message.reply_text("查無店家，試著輸入其他條件")
@@ -316,6 +331,8 @@ searchHandler = ConversationHandler(
     fallbacks=[CommandHandler("cancel", cancel_search)])
 
 
+
+# 增加新店功能區 #################################
 newshop = list()
 
 
@@ -333,7 +350,6 @@ add_str_dict: Dict[int, str] = {
 }
 
 
-# 增加新店功能區 #################################
 @restricted
 def add_new(update, context):
     if len(newshop) == 0:
@@ -457,6 +473,7 @@ def preview(update, context):
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_markdown("以下是資料預覽\n\n" + make_info_str(newshop, False), reply_markup=reply_markup)
 
+
 def preview_callback(update, context):
     query = update.callback_query
     if query.data == 'confirm':
@@ -495,10 +512,13 @@ def edit_notice(update, context):
         query.edit_message_text(add_str_dict[int(query.data)])
     else:
         logger.info("incorrect query")
+
+
 def edit_finish(update, context):
     newshop[newshop.index(None)] = update.message.text
     preview(update, context)
     return 'preview'
+
 
 def addto_db(update, context):
     newshop.append(update.message.text)
@@ -518,7 +538,7 @@ def canceladd(update, context):
 def start(update, context):
     """Send a message when the command /start is issued."""
     # TODO: Add some welcome text
-    update.message.reply_text('歡迎使用拉麵 bot!')
+    update.message.reply_text('歡迎使用台灣拉麵 bot!')
 
 
 def echo(update, context):
@@ -526,7 +546,7 @@ def echo(update, context):
 
 
 def tg_help(update, context):
-    keyboard = [[InlineKeyboardButton("隨便幫我挑一家", callback_data="random")],
+    keyboard = [[InlineKeyboardButton("隨便幫我挑一家", callback_data="now")],
                 [InlineKeyboardButton("簡易搜尋", callback_data="find")]]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -581,15 +601,13 @@ def rare_condition(update, context):
 
 # TODO: search by index
 
-def random_ramen(update, context):
-    message = getTime() + "\n"
-    # TODO: handle time
+def ramen_now(update, context):
+    message, query_time = getTime()
+
     # Find in database
+    s = dbHelper.query_time(query_time)[0]
 
-    n = dbHelper.query_random_id()['id']
-
-    # TODO: figure out where to put notes & fix query string below
-    s = dbHelper.query_specify(['id'], [n])[0]
+    # TODO: figure out where to put notes
     message += make_info_str(s, True)
     if update.message:
         update.message.reply_markdown(message)
@@ -633,17 +651,18 @@ def main():
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("random", random_ramen))
+    dp.add_handler(CommandHandler("now", ramen_now))
     dp.add_handler(CommandHandler("event", by_event))
     dp.add_handler(CommandHandler("rare", rare_condition))
     dp.add_handler(CommandHandler("help", tg_help))
-    dp.add_handler(CallbackQueryHandler(random_ramen, pattern="random"))
+
+    dp.add_handler(CallbackQueryHandler(ramen_now, pattern="now"))
     dp.add_handler(CallbackQueryHandler(search, pattern="find"))
     dp.add_handler(CallbackQueryHandler(find_another, pattern="^another"))
     dp.add_handler(searchHandler)
     dp.add_handler(addHandler)
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    #dp.add_handler(MessageHandler(Filters.text, echo))
 
     if mode == "dev":
         pass
@@ -655,17 +674,6 @@ def main():
         updater.bot.set_webhook("https://ramenbot-tw.herokuapp.com/" + TOKEN)
     updater.idle()
 
-def getTime():
-
-    APM = {
-        "AM": "上午",
-        "PM": "下午"
-    }
-
-    queryTime = time.localtime()
-    return "查詢時間: %s %s %s" % (week_day_dict[queryTime.tm_wday],
-                                  APM[time.strftime("%p", queryTime)],
-                                  time.strftime("%I:%M", queryTime))
 
 
 if __name__ == '__main__':
