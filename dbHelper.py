@@ -3,7 +3,7 @@ import os
 uri = "postgres://fbmnkbtvzzzcyj:bd94f7412bded46a97eaee7a1b7c8b8ff096871735d78608deb9f5932f450243@ec2-54-83-196-179.compute-1.amazonaws.com:5432/d39tbgvraon9tp"
 
 mode = os.getenv("env")
-basic_query_str = "select name,loc,weekday,opening,soup,type,price,gmapid from ramenya "
+basic_query_str = "select id,name,loc,weekday,opening,soup,type,price,gmapid from ramenya "
 
 def checkenv():
     # if mode == "dev":
@@ -16,9 +16,9 @@ def checkenv():
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     return cur
 
-def check_dub(gmapkey):
+def query_by_id(id):
     cur = checkenv()
-    s = "select * from ramenya where gmapid ='%s';" % gmapkey
+    s = "select * from ramenya where id= {};".format(id)
 
     cur.execute(s)
     return cur.fetchone()
@@ -60,13 +60,21 @@ def query_specify(col_list, key_list):
 
     # TODO: empty return handling
     return cur.fetchall()
-def query_time(time):
+def query_time(weekday,time):
     cur = checkenv()
     try:
-        print(time)
-        query_str = "SELECT * FROM ramenya where (opening[1]<'{time}' and opening[2] > '{time}') " \
-                    "or (opening[3]<'{time}' and opening[4] > '{time}') ORDER BY RANDOM();".format(time=time)
-        cur.execute(query_str)
+        time = int(time)
+        if weekday is not None:
+            query_str = "SELECT * FROM ramenya where (weekday = -1 or weekday = %(weekday)s) and " \
+                        "((opening[1]<'%(time)s' and opening[2] > '%(time)s') or " \
+                        "(opening[3]<'%(time)s' and opening[4] > '%(time)s')) ORDER BY RANDOM();"
+
+            cur.execute(query_str,{'weekday':weekday,'time':time})
+        else:
+            query_str = "SELECT * FROM ramenya where" \
+                        "((opening[1]<'%(time)s' and opening[2] > '%(time)s') or " \
+                        "(opening[3]<'%(time)s' and opening[4] > '%(time)s')) ORDER BY RANDOM();"
+            cur.execute(query_str,{'time':time})
     except sqlite3.OperationalError:
         print(query_str)
     return cur.fetchall()

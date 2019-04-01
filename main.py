@@ -208,7 +208,7 @@ def mealtime(update, context):
                 'midnight': 2130
             }.get(x, 1800)
         time_to_select = f(query)
-        s = dbHelper.query_time(time_to_select)
+        s = dbHelper.query_time(None,time_to_select)
         if s:
             reply_markup = reply_markup = make_info_inline_kb(s[0]['gmapid'], cur_condition, time_to_select, QUERY_METHOD.TIME)
             update.callback_query.message.reply_markdown(make_info_str(s[0], True), reply_markup=reply_markup,
@@ -320,7 +320,7 @@ def cancel_search(update, context):
 
 
 searchHandler = ConversationHandler(
-    entry_points=[CommandHandler("search", search)],
+    entry_points=[CommandHandler("search", search),CallbackQueryHandler(search, pattern="find")],
     states={
         'condition':[CallbackQueryHandler(condition)],
         'mealtime':[CallbackQueryHandler(mealtime)],
@@ -545,6 +545,21 @@ def echo(update, context):
     update.message.reply_text(update.message.text)
 
 
+def search_by_name(update, context):
+    userinput = update.message.text
+    s = dbHelper.query_like('name',userinput)
+    message = ""
+    if s:
+        for a in s:
+            message += "{id}, {name} - {location}\n".format(id = a['id'],name =a['name'],location=a['loc'][a['loc'].find('.')+1:])
+        message += "\n使用 /id (店家編號) 取得更多資訊"
+        update.message.reply_text(message)
+
+
+def no_result(update, context):
+    update.message.reply_text("找不到適合的店家，請使用其他條件")
+
+
 def tg_help(update, context):
     keyboard = [[InlineKeyboardButton("隨便幫我挑一家", callback_data="now")],
                 [InlineKeyboardButton("簡易搜尋", callback_data="find")]]
@@ -567,9 +582,10 @@ def find_another(update,context):
         elif QUERY_METHOD(int(querylist[4])) == QUERY_METHOD.LIKE:
             s = dbHelper.query_like(querylist[1], querylist[2])[0]
         elif QUERY_METHOD(int(querylist[4])) == QUERY_METHOD.TIME:
-            s = dbHelper.query_time(querylist[2])[0]
+            s = dbHelper.query_time(None,querylist[2])[0]
         else:
             s = dbHelper.query_specify([querylist[1]], [querylist[2]])[0]
+        # TODO: specify correct condition
         if len(s)==1 or s['gmapid'] != querylist[3]:
             repeat = False
 
@@ -599,14 +615,29 @@ def rare_condition(update, context):
     return 'condition'
 
 
-# TODO: search by index
+def search_by_id(update,context):
+    if context.args:
+        i_input = context.args[0]
+    else:
+        update.message.reply_markdown("指令格式為 /id (店家編號)")
+        return
+
+    s = dbHelper.query_by_id(i_input)
+    if s:
+        update.message.reply_markdown(make_info_str(s, True))
+    else:
+        update.message.reply_markdown("找不到指定的 ID")
 
 def ramen_now(update, context):
     message, query_time = getTime()
 
     # Find in database
-    s = dbHelper.query_time(query_time)[0]
-
+    s = dbHelper.query_time(None,query_time)
+    if s:
+        s= s[0]
+    else:
+        no_result(update,context)
+        return
     # TODO: figure out where to put notes
     message += make_info_str(s, True)
     if update.message:
@@ -655,14 +686,13 @@ def main():
     dp.add_handler(CommandHandler("event", by_event))
     dp.add_handler(CommandHandler("rare", rare_condition))
     dp.add_handler(CommandHandler("help", tg_help))
-
+    dp.add_handler(CommandHandler("id", search_by_id,pass_args=True))
     dp.add_handler(CallbackQueryHandler(ramen_now, pattern="now"))
-    dp.add_handler(CallbackQueryHandler(search, pattern="find"))
     dp.add_handler(CallbackQueryHandler(find_another, pattern="^another"))
     dp.add_handler(searchHandler)
     dp.add_handler(addHandler)
     # on noncommand i.e message - echo the message on Telegram
-    #dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(MessageHandler(Filters.text, search_by_name))
 
     if mode == "dev":
         pass
