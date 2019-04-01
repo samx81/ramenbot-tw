@@ -2,7 +2,7 @@ import configparser
 import logging
 import os, sys
 from enum import Enum
-import time,random
+import datetime
 from typing import Dict
 
 import dbHelper
@@ -35,6 +35,8 @@ logger = logging.getLogger(__name__)
 #gmaps = googlemaps.Client(key=config['GOOGLE']['API_KEY'])
 mode = os.getenv("env")
 
+dt = datetime
+tw_timezone = dt.timezone(dt.timedelta(hours=8))
 
 jb = jieba_hant
 
@@ -140,12 +142,12 @@ def getTime():
         else:
             return "晚上"
 
-    queryTime = time.localtime()
-    time_str = "查詢時間: %s %s %s \n" % (week_day_dict[queryTime.tm_wday],
-                                          apm_to_str(queryTime.tm_hour),
-                                          time.strftime("%I:%M", queryTime))
-    query = time.strftime("%H%M", queryTime)
-    return time_str,queryTime.tm_wday, query
+    queryTime = dt.datetime.now(tw_timezone)
+    time_str = "查詢時間: %s %s %s \n" % (week_day_dict[queryTime.weekday()],
+                                          apm_to_str(queryTime.hour),
+                                          queryTime.strftime("%I:%M"))
+    query = queryTime.strftime("%H%M")
+    return time_str,queryTime.weekday(), query
 
 # 簡易搜尋 #
 def search(update, context):
