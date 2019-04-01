@@ -446,7 +446,7 @@ def getinfo(update, context):
             # deal with time
             tmp = str(update.message.text)
             timelist = list()
-            if tmp.find(","):
+            if tmp.find(",") is not -1:
                 tmp = tmp.split(",")
                 timelist= tmp[0].split('-')+tmp[1].split('-')
             newshop.append(",".join(timelist))
@@ -486,6 +486,7 @@ def preview_callback(update, context):
     query = update.callback_query
     if query.data == 'confirm':
         dbHelper.insert_new(newshop)
+        newshop.clear()
         query.message.reply_text("新增成功！")
         return ConversationHandler.END
     elif query.data == 'edit':
@@ -528,11 +529,11 @@ def edit_finish(update, context):
     return 'preview'
 
 
-def addto_db(update, context):
-    newshop.append(update.message.text)
-    dbHelper.insert_new(newshop)
-    newshop.clear()
-
+# def addto_db(update, context):
+#     newshop.append(update.message.text)
+#     dbHelper.insert_new(newshop)
+#     newshop.clear()
+#     return ConversationHandler.END
 
 def canceladd(update, context):
     user = update.message.from_user
@@ -664,7 +665,8 @@ addHandler = ConversationHandler(
        "gathering": [MessageHandler(Filters.text,getinfo),CallbackQueryHandler(getinfo)],
        "preview":[MessageHandler(Filters.text,preview),CallbackQueryHandler(preview_callback)],
        "edit":[CallbackQueryHandler(edit_notice),MessageHandler(Filters.text,edit_finish)],
-       "insert":[MessageHandler(Filters.text,addto_db)]},
+       # "insert":[MessageHandler(Filters.text,addto_db)]
+    },
     fallbacks=[CommandHandler("cancel", canceladd)])
 
 
