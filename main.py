@@ -131,17 +131,21 @@ def is_int(value):
 
 def getTime():
 
-    APM = {
-        "AM": "上午",
-        "PM": "下午"
-    }
+    def apm_to_str(hour):
+        hour = int(hour)
+        if hour <12:
+            return "上午"
+        elif hour <17:
+            return "下午"
+        else:
+            return "晚上"
 
     queryTime = time.localtime()
     time_str = "查詢時間: %s %s %s \n" % (week_day_dict[queryTime.tm_wday],
-                                  APM[time.strftime("%p", queryTime)],
-                                  time.strftime("%I:%M", queryTime))
+                                          apm_to_str(queryTime.tm_hour),
+                                          time.strftime("%I:%M", queryTime))
     query = time.strftime("%H%M", queryTime)
-    return time_str, query
+    return time_str,queryTime.tm_wday, query
 
 # 簡易搜尋 #
 def search(update, context):
@@ -354,7 +358,7 @@ add_str_dict: Dict[int, str] = {
 @restricted
 def add_new(update, context):
     if len(newshop) == 0:
-        update.message.reply_markdown("請按照提示輸入對應的資料\n"
+        update.message.reply_markdown("請按照提示輸入對應的資料，建議資料來源參照 GoogleMap\n"
                                       "未知可填無\n"
                                       "若要取消請輸入 /cancel")
         update.message.reply_text(add_str_dict[-1])
@@ -631,10 +635,10 @@ def search_by_id(update,context):
         update.message.reply_markdown("找不到指定的 ID")
 
 def ramen_now(update, context):
-    message, query_time = getTime()
+    message, weekday,query_time = getTime()
 
     # Find in database
-    s = dbHelper.query_time(None,query_time)
+    s = dbHelper.query_time(weekday,query_time)
     if s:
         s= s[0]
     else:
