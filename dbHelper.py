@@ -3,7 +3,7 @@ import os
 uri = "postgres://fbmnkbtvzzzcyj:bd94f7412bded46a97eaee7a1b7c8b8ff096871735d78608deb9f5932f450243@ec2-54-83-196-179.compute-1.amazonaws.com:5432/d39tbgvraon9tp"
 
 mode = os.getenv("env")
-basic_query_str = "select id,name,loc,weekday,opening,soup,type,price,gmapid from ramenya "
+basic_query_str = "select id,name,loc,weekday,opening,soup,type,price,gmapid,note from ramenya "
 
 def checkenv():
     # if mode == "dev":
@@ -80,7 +80,7 @@ def query_time(weekday,time):
     return cur.fetchall()
 
 def insert_new(list):
-    s = "insert into ramenya (name, gmapid,loc,weekday,opening,soup,type,price,note) " \
+    s = "insert into ramenya (name, gmapid,loc,weekday,opening,type,soup,price,note) " \
         "values ('%s','%s','%s',%s,'{%s}','%s','%s','%s','%s');" \
         % (list[0],list[1],list[2],list[3],list[4],list[5],list[6],list[7],list[8])
     cur = checkenv()

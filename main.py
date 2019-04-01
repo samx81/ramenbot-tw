@@ -81,6 +81,7 @@ format_template ="""
 ￭*營業時間*：{A}{empty}{B}
 ￭*定休日*：{restday}
 ￭*價格帶*：{price}
+￭*附註*：{note}
 {maplink}
 """
 
@@ -106,7 +107,7 @@ def make_info_str(s, sql):
                                       soup=s['soup'], type=s['type'], A=first_opening,
                                       empty="\n￭－－－－▏" if second_opening else "",
                                       B=second_opening if second_opening else "",
-                                      restday=week_day_dict[s['weekday']], price=s['price'])
+                                      restday=week_day_dict[s['weekday']], price=s['price'],note=s['note'])
     else:
         info = format_template.format(name=s[0], loc=s[2], maplink="https://goo.gl/maps/" + s[1],
                                       soup=s[6], type=s[5], A=s[4],empty="",B="", restday=week_day_dict[int(s[3])], price=s[7])
