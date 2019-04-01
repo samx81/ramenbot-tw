@@ -146,10 +146,9 @@ def getTime():
     time_str = "查詢時間: %s %s %s \n" % (week_day_dict[queryTime.tm_wday],
                                   APM(queryTime.tm_hour).value,
                                   time.strftime("%I:%M", queryTime))
-    weekday = queryTime.tm_wday
-    hour_minute = time.strftime("%H%M", queryTime)
+    query = time.strftime("%H%M", queryTime)
     print(time_str)
-    return time_str, weekday,hour_minute
+    return time_str, query
 
 # 簡易搜尋 #
 def search(update, context):
@@ -611,10 +610,10 @@ def rare_condition(update, context):
 # TODO: search by index
 
 def ramen_now(update, context):
-    message,weekday, query_time = getTime()
+    message, query_time = getTime()
 
     # Find in database
-    s = dbHelper.query_time(weekday,query_time)[0]
+    s = dbHelper.query_time(query_time)[0]
 
     # TODO: figure out where to put notes
     message += make_info_str(s, True)
