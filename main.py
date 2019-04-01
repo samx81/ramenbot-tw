@@ -112,7 +112,8 @@ def make_info_str(s, sql):
                                       restday=week_day_dict[s['weekday']], price=s['price'],note=s['note'])
     else:
         info = format_template.format(name=s[0], loc=s[2], maplink="https://goo.gl/maps/" + s[1],
-                                      soup=s[6], type=s[5], A=s[4],empty="",B="", restday=week_day_dict[int(s[3])], price=s[7])
+                                      soup=s[6], type=s[5], A=s[4],empty="",B="", restday=week_day_dict[int(s[3])],
+                                      price=s[7], note=s[8])
 
     return info
 
