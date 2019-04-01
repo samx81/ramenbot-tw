@@ -128,26 +128,18 @@ def is_int(value):
   except:
     return False
 
-
-class APM_dict(Enum):
-    m,af,n = "上午","下午","晚上"
 def getTime():
 
-    def APM(hour):
-
-        if hour < 12:
-            return APM_dict.m
-        elif hour < 17:
-            return APM_dict.af
-        else:
-            return APM_dict.n
+    APM = {
+        "AM": "上午",
+        "PM": "下午"
+    }
 
     queryTime = time.localtime()
     time_str = "查詢時間: %s %s %s \n" % (week_day_dict[queryTime.tm_wday],
-                                  APM(queryTime.tm_hour).value,
+                                  APM[time.strftime("%p", queryTime)],
                                   time.strftime("%I:%M", queryTime))
     query = time.strftime("%H%M", queryTime)
-    print(time_str)
     return time_str, query
 
 # 簡易搜尋 #
@@ -628,7 +620,7 @@ def ramen_now(update, context):
 addHandler = ConversationHandler(
     entry_points=[CommandHandler("new", add_new)],
     states={
-        # TODO: catch error on two handler section?
+        # TODO: catch error on two handler section
        "gathering": [MessageHandler(Filters.text,getinfo),CallbackQueryHandler(getinfo)],
        "preview":[MessageHandler(Filters.text,preview),CallbackQueryHandler(preview_callback)],
        "edit":[CallbackQueryHandler(edit_notice),MessageHandler(Filters.text,edit_finish)],
@@ -670,7 +662,7 @@ def main():
     dp.add_handler(searchHandler)
     dp.add_handler(addHandler)
     # on noncommand i.e message - echo the message on Telegram
-    # dp.add_handler(MessageHandler(Filters.text, echo))
+    #dp.add_handler(MessageHandler(Filters.text, echo))
 
     if mode == "dev":
         pass

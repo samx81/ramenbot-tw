@@ -35,7 +35,7 @@ def query_begin_with():
     cur = checkenv()
     query_str = basic_query_str + " WHERE loc LIKE 'tp.%' ORDER BY RANDOM();"
     cur.execute(query_str)
-    return cur.fetchone()
+    return cur.fetchall()
 
 def query_like(col,key):
     cur = checkenv()
@@ -45,7 +45,7 @@ def query_like(col,key):
         cur.execute(query_str)
     except sqlite3.OperationalError:
         print(query_str)
-    return cur.fetchone()
+    return cur.fetchall()
 
 def query_specify(col_list, key_list):
     cur = checkenv()
@@ -59,25 +59,17 @@ def query_specify(col_list, key_list):
         print(query_str)
 
     # TODO: empty return handling
-    return cur.fetchone()
-def query_time(weekday,time):
+    return cur.fetchall()
+def query_time(time):
     cur = checkenv()
     try:
-        print(weekday,time)
-        if weekday is not None:
-            query_str = "SELECT * FROM ramenya where (weekday = {weekday} or weekday = -1) and" \
-                        " ((opening[1]<'{time}' and opening[2] > '{time}') or" \
-                        " (opening[3]<'{time}' and opening[4] > '{time}')) ORDER BY RANDOM();"\
-                        .format(weekday = weekday,time=time)
-        else:
-            query_str = "SELECT * FROM ramenya where" \
-                        " ((opening[1]<'{time}' and opening[2] > '{time}') or" \
-                        " (opening[3]<'{time}' and opening[4] > '{time}')) ORDER BY RANDOM();" \
-                .format(time=time)
+        print(time)
+        query_str = "SELECT * FROM ramenya where (opening[1]<'{time}' and opening[2] > '{time}') " \
+                    "or (opening[3]<'{time}' and opening[4] > '{time}') ORDER BY RANDOM();".format(time=time)
         cur.execute(query_str)
     except sqlite3.OperationalError:
         print(query_str)
-    return cur.fetchone()
+    return cur.fetchall()
 
 def insert_new(list):
     s = "insert into ramenya (name, gmapid,loc,weekday,opening,soup,type,price,note) " \
