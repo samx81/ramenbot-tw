@@ -65,7 +65,7 @@ def query_time(weekday,time):
     try:
         time = int(time)
         if weekday is not None:
-            query_str = "SELECT * FROM ramenya where (weekday = -1 or weekday = %(weekday)s) and " \
+            query_str = "SELECT * FROM ramenya where (weekday = -1 or weekday != %(weekday)s) and " \
                         "((opening[1]<'%(time)s' and opening[2] > '%(time)s') or " \
                         "(opening[3]<'%(time)s' and opening[4] > '%(time)s')) ORDER BY RANDOM();"
 
