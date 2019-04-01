@@ -523,6 +523,7 @@ def edit_finish(update, context):
 def addto_db(update, context):
     newshop.append(update.message.text)
     dbHelper.insert_new(newshop)
+    newshop.clear()
 
 
 def canceladd(update, context):
