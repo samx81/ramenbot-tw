@@ -29,7 +29,7 @@ soupsieve = "==1.8"
 tornado = "==6.0.1"
 urllib3 = "==1.24.1"
 Flask = "==1.0.2"
-Jinja2 = "==2.10"
+Jinja2 = "==2.11.3"
 MarkupSafe = "==1.1.1"
 Werkzeug = "==0.14.1"
 
